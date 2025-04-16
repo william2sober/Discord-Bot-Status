@@ -10,16 +10,16 @@ const client = new Client({
   ]
 });
 
-const CHANNEL_ID = '1358087159353184318';
+const CHANNEL_ID = '';
 const embedLogFile = 'embed_log.json';
 let sentMessageId = null;
 
 const bots = [
-  { name: "William's Server", id: '1355937757683253298' },
-  { name: "William's Tickets", id: '1355936471932211210' },
-  { name: "William's Music", id: '1358565970851139786' },
-  { name: "William's AI", id: '1359231202074038445' },
-  { name: "William's UpTimer", id: '1359221294767538297' }
+  { name: "Bot 1", id: '1355937757683253298' },
+  { name: "Bot 2", id: '1355936471932211210' },
+  { name: "Bot 3", id: '1358565970851139786' },
+  { name: "Bot 4", id: '1359231202074038445' },
+  { name: "Bot 5", id: '1359221294767538297' }
 ];
 
 function formatStatus(name, status) {
@@ -50,7 +50,7 @@ async function updateStatusEmbed() {
 
   const embed = new EmbedBuilder()
     .setTitle("William's Bot Status")
-    .setDescription("Current status of bots developed by William:")
+    .setDescription("Current status of bots:")
     .setColor(0x842ABE)
     .addFields(statuses)
     .setTimestamp();
