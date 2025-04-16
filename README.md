@@ -1,7 +1,3 @@
-Here’s a more basic **README.md** based on your example:
-
----
-
 <h1 align="center">
    Discord Bot Status Embed
 </h1>
@@ -52,5 +48,3 @@ This is a **Discord bot** that monitors the status of various bots and sends an 
    ```
 
 ---
-
-This should be a simple and easy-to-follow README for your project. Let me know if you need any changes!
