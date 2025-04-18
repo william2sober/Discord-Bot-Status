@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActivityType } = require('discord.js');
 require('dotenv').config();
 const fs = require('fs');
 
@@ -13,6 +13,8 @@ const client = new Client({
 const CHANNEL_ID = '';
 const embedLogFile = 'embed_log.json';
 let sentMessageId = null;
+let statusData = { online: 0, offline: 0 };
+let statusToggle = true;
 
 const bots = [
   { name: "Bot 1", id: '1355937757683253298' },
@@ -36,21 +38,28 @@ function formatStatus(name, status) {
 
 async function updateStatusEmbed() {
   const statuses = [];
+  let onlineCount = 0;
+  let offlineCount = 0;
 
   for (const bot of bots) {
     try {
       const user = await client.users.fetch(bot.id);
       const presence = await client.guilds.cache.first()?.members.fetch(bot.id);
       const status = presence?.presence?.status || 'offline';
+      if (['online', 'idle', 'dnd'].includes(status)) onlineCount++;
+      else offlineCount++;
       statuses.push(formatStatus(bot.name, status));
     } catch {
+      offlineCount++;
       statuses.push(formatStatus(bot.name, 'offline'));
     }
   }
 
+  statusData = { online: onlineCount, offline: offlineCount };
+
   const embed = new EmbedBuilder()
     .setTitle("William's Bot Status")
-    .setDescription("Current status of bots:")
+    .setDescription("Current status of bots developed by William:")
     .setColor(0x842ABE)
     .addFields(statuses)
     .setTimestamp();
@@ -65,15 +74,21 @@ async function updateStatusEmbed() {
     } catch {
       const newMsg = await channel.send({ embeds: [embed] });
       sentMessageId = newMsg.id;
-      const embedData = { embedId: sentMessageId };
-      fs.writeFileSync(embedLogFile, JSON.stringify(embedData, null, 2));
+      fs.writeFileSync(embedLogFile, JSON.stringify({ embedId: sentMessageId }, null, 2));
     }
   } else {
     const message = await channel.send({ embeds: [embed] });
     sentMessageId = message.id;
-    const embedData = { embedId: sentMessageId };
-    fs.writeFileSync(embedLogFile, JSON.stringify(embedData, null, 2));
+    fs.writeFileSync(embedLogFile, JSON.stringify({ embedId: sentMessageId }, null, 2));
   }
+}
+
+function rotateBotStatus() {
+  const text = statusToggle
+    ? `${statusData.online} Bot${statusData.online !== 1 ? 's' : ''} Online`
+    : `${statusData.offline} Bot${statusData.offline !== 1 ? 's' : ''} Offline`;
+  client.user.setActivity(text, { type: ActivityType.Watching });
+  statusToggle = !statusToggle;
 }
 
 client.once('ready', () => {
@@ -83,7 +98,8 @@ client.once('ready', () => {
   }
 
   updateStatusEmbed();
-  setInterval(updateStatusEmbed, 30 * 1000);
+  setInterval(updateStatusEmbed, 30000); 
+  setInterval(rotateBotStatus, 15000);
 });
 
 client.login(process.env.TOKEN);
